@@ -1,0 +1,153 @@
+1 - Microserviços
+	- Pequenos, e focados em fazer apenas um coisa e fazê-la bem
+	- Autônomos
+		Cada um tem vida própria e se comunicam via protocolos rede
+	- Benefícios
+		Possíbilidade de TI heterogênia
+		Resiliência
+		Escalabilidade
+		Facilidade de deployment
+		Alinhamento Organizacional
+			No Bacen não existe um grande monolito, mas pequenos monolitos já divididos em pacotes de negócio autonomos. Exceto componentes
+		Possibilidade de composição
+		Facilidade de troca
+	- Comparação com outras tecnologias de decomposição
+		Shared libraries
+			Perda da heterogeniedade
+		Modularização
+			OSGI, por exemplo, é mais do que simplesmente shared libraries. Tem ciclo de vida bem definido.
+			A obrigação de segregação em aplicações autônomas é uma força que atua para que a divisão em módulos seja feita da forma correta
+
+2 - Uma arquitetura evolucionária - Muito foco sobre o papel do arquiteto
+	- Com a liberdade que os microserviços oferecem a gama de possiblidade de linguages/framworks/ambientes de execução aumente exponencialmente.
+	  Qual o papel do arquiteto então?
+	- Considerando a velocidade das mudanças na área da TI a idéia do arquiteto como alguém que passa intruções detalhadas para pessoas executarem
+	  (idéia roubada da arquitetura) é válida?
+	- Uma melhor comparação pode ser feita entre o arquiteto que faz zoneamento urbano.
+		- Ele é responsável por dividir a cidade em compartições e pensar em todo o arcabouço responsável pela interação entre estas compartições
+	- Uma abordagem baseada em princípios
+		- Objetivos estratégicos
+		-Princípios
+			- Regras para o atendimento de um objetivo maior
+		-Práticas
+			- Como os princípios serão atingidos
+	- O que compõe um "bom serviço"
+		- Qual o mínimo de monitoramento que um serviço deve ter?
+		- Qual a interface de comunicação entre os serviços?
+		- Qual o mínimo arquitetural que um serviço deve ter?
+			- por exemplo: se for HTTP deve respeitar, no mínimo, quais response codes?
+	- Como ajudar as pessoas a fazerem as coisas da forma correta?
+		- Exemplos
+		- Template de serviço
+	- Debito técnico
+		- Como ligar com aplicações que não estão seguindo os princípios?
+			Quando abrimos mão de um princípio por uma imposição de prazo, por exemplo?
+			Quando mudamos os princípios e agora vários serviços não estão aderentes?
+
+3 - Como modelar serviços
+	- O que define um bom serviço?
+		- Baixo acoplamento e alta coesão
+	- Bounded Context
+		- É mais díficil acertar a decomposição quando os seriços estão sendo criados pela primeira vez do que quando a são derivados da decomposição de um monolito
+
+4 - Integração
+	- Acertar na tecnologia de integração é o aspecto mais importante, na opinião do autor, para o sucesso da implementação de microserviços
+	- Orquestração x Coreografia
+		Orquestração : ator central controla o processo
+			atores não centrais tentem a ficar anêmicos
+			Falha do ator central afeta todo o processo
+		Coreografia : não existe ator central
+
+	- RPC
+		Alto nível de acoplamento entre servidor e cliente. Pequenas mudanças no servidor fazem clientes ficarem incompatíveis
+	- REST
+		Hateoas ou não?
+				Hateoas é melhor mas benefício não vem no curto prazo.
+
+	- Event-Base Asynchronous
+		Lidar com assincronia é mais complexo do que programação tradicional
+			Ex: Enviar um mensagem de criação de uma entidade.
+				Esperar pela resposta? E se ela não veir? Quanto tempo esperar? Reenviar?
+
+	- Reactvive Extensions
+		Rx. Mecanismo para compor várias chamadas assincronas.
+
+	- DRY x Reuso de código
+		Reuso de código aumenta o acoplamento entre os serviços
+
+		- Client Libraries
+			Se não usada de forma correta aumenta o acoplamento. Contra exemplo: bc-rest
+
+	- Versionamento
+		- O que causa uma quebra do contrato entre as partes
+			Tecnologia impacta na evolução da api. BcRest : XML lida melhor com evolução da API do que RMI
+
+		- Estudar a possiblidade de convivência de diverentes versões de serviços até que clientes possam mudar para nova versão
+			Obs: É necessário? Se a mudança gerar um quebra da compatibilidade da API como coesistir?
+
+	- Uso de software de pratileira para integração
+		- Perda do controle
+			O vendedor decide qual o caminho de evolução que a ferramenta vai seguir. Pode não ser o que vc quer
+
+		- Nível de customização baixo
+			Ferramentas podem oferecer muitas formas de conexão, o que pode trazer um grau de heterogeniedade prejudicial
+
+5 - Quebrando o monolito
+
+	- Código
+		- Quando vc altera um linha de código em um monolito o que mais é afetado?
+
+	- O Banco de dados
+		- No bacen as fronteiras entre os sistemas estão bem definidas
+		- Mas e quando quebramos os sistemas em microservicos
+
+
+	- Ex shrared static data:Códigos de paises
+		- Duplicar esta tabela em cada um dos serviços
+			- Possíveis problemas de sincronismo
+		- Colocar tabela em código ou itens de configuração
+			- problemas de sincronismos mas mais fácil de sincronizar que tabelas
+		- Criar um serviço
+			- Solução muito complexa para um dominio relativamente simples
+
+	- Ex shared mutable data: Registro de cliente
+		- Acessado tanto por serviços financeiros quanto serviços de entrega
+		- Criar serviço independente
+
+	- Ex shared tables : Itens
+		- Acessado pelo catálogo de produtos e pelo inventário
+		- Separar as infommações de itens em um tabela para o serviço de produto e uma para o serviço de inventário
+
+	- Transaction Boundaries
+		- Não é mais possível (nem desejável) quando o monolito é separado
+			diferentes bancos
+		- Estratégias para transações entre serviços
+			- Compensação no lugar de transações distribuidas
+
+	- Reporting Database
+		- Recuperar dados via chamadas a vários serviços
+			- Pouco eficiente. Funcional em poucos use cases
+		- Data pump
+			- Operações nos serviços tem reflexos em um banco que agrega esquemas de todos os bancos
+
+6 - Deployment
+	- Continuous delivery
+		- Capacidade de fazer deploys de microserviços
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
