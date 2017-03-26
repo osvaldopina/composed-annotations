@@ -10,72 +10,101 @@ import com.github.osvaldopina.composedannotation.annotation.MethodInherited;
 
 public class MethodAnnotationCollector implements AnnotationCollector {
 
-	private BridgedMethodFinder bridgedMethodFinder = BridgedMethodFinder.INSTANCE;
+    private BridgedMethodFinder bridgedMethodFinder = BridgedMethodFinder.INSTANCE;
 
-	@Override
-	public Set<Annotation> collectAll(AnnotatedElement annotatedElement) {
-		Set<Annotation> annotations = new HashSet<Annotation>();
+    @Override
+    public Set<Annotation> collectAll(AnnotatedElement annotatedElement) {
+        Map<Class<? extends Annotation>,Annotation> annotations = new HashMap<Class<? extends Annotation>,Annotation>();
 
-		Method method = (Method) annotatedElement;
+        Method method = (Method) annotatedElement;
 
-		annotations.addAll(collectAllFromMethod(method));
+        addAll(annotations, collectAllFromMethod(method), false);
 
-		Method correspondent = bridgedMethodFinder.getCorrespondent(method);
 
-		if (correspondent != null) {
-			annotations.addAll(collectAllFromMethod(correspondent));
-		}
+        Method correspondent = bridgedMethodFinder.getCorrespondent(method);
 
-		return annotations;
-	}
+        if (correspondent != null) {
+            addAll(annotations, collectAllFromMethod(correspondent), false);
+        }
 
-	@Override
-	public boolean canBeAppliedTo(AnnotatedElement annotatedElement) {
-		return annotatedElement instanceof Method;
-	}
+        return new HashSet<Annotation>(annotations.values());
+    }
 
-	private Method getFromClass(Class<?> clazz, Method original) {
-		try {
-			return clazz.getMethod(original.getName(), original.getParameterTypes());
-		} catch (NoSuchMethodException e) {
-			return null;
-		}
-	}
+    @Override
+    public boolean canBeAppliedTo(AnnotatedElement annotatedElement) {
+        return annotatedElement instanceof Method;
+    }
 
-	private Set<Annotation> collectAllFromMethod(Method method) {
-		Set<Annotation> annotations = new HashSet<Annotation>();
+    private Method getFromClass(Class<?> clazz, Method original) {
+        try {
+            return clazz.getMethod(original.getName(), original.getParameterTypes());
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
+    }
 
-		addAll(annotations, Arrays.asList(method.getDeclaredAnnotations()),false);
+    private Set<Annotation> collectAllFromMethod(Method method) {
+        Map<Class<? extends Annotation>,Annotation> annotations = new HashMap<Class<? extends Annotation>,Annotation>();
 
-		Class<?> declaringClass = method.getDeclaringClass();
+        addAll(annotations, Arrays.asList(method.getDeclaredAnnotations()), false);
 
-		Method otherDeclarations;
-		while (!Object.class.equals(declaringClass)) {
-			otherDeclarations = getFromClass(declaringClass, method);
-			if (otherDeclarations != null) {
-				addAll(annotations, Arrays.asList(otherDeclarations.getDeclaredAnnotations()),true);
-			}
-			for (Class<?> implInterface : declaringClass.getInterfaces()) {
-				otherDeclarations = getFromClass(implInterface, method);
-				if (otherDeclarations != null) {
-					addAll(annotations, Arrays.asList(otherDeclarations.getDeclaredAnnotations()),true);
-				}
-			}
-			declaringClass = declaringClass.getSuperclass();
-		}
+        Class<?> declaringClass = method.getDeclaringClass();
 
-		return Collections.unmodifiableSet(annotations);
-	}
+        Method otherDeclarations;
+        while (!Object.class.equals(declaringClass)) {
+            otherDeclarations = getFromClass(declaringClass, method);
+            if (otherDeclarations != null) {
+                addAll(annotations, Arrays.asList(otherDeclarations.getDeclaredAnnotations()), true);
+            }
+            for (Class<?> implInterface : declaringClass.getInterfaces()) {
+                otherDeclarations = getFromClass(implInterface, method);
+                if (otherDeclarations != null) {
+                    addAll(annotations, Arrays.asList(otherDeclarations.getDeclaredAnnotations()), true);
+                }
+            }
+            declaringClass = declaringClass.getSuperclass();
+        }
 
-	private void addAll(Set<Annotation> annotations, Collection<Annotation> annotationsToBeAdded, boolean inheritedOnly) {
-		for (Annotation annotationToBeAdded : annotationsToBeAdded) {
-			if (inheritedOnly) {
-				if (annotationToBeAdded.annotationType().isAnnotationPresent(MethodInherited.class)) {
-					annotations.add(annotationToBeAdded);
-				}
-			} else {
-				annotations.addAll(annotationsToBeAdded);
-			}
-		}
-	}
+        return new HashSet<Annotation>(annotations.values());
+    }
+
+    private void addAll(Map<Class<? extends Annotation>,Annotation> annotations, Collection<Annotation> annotationsToBeAdded, boolean inheritedOnly) {
+        for (Annotation annotationToBeAdded : annotationsToBeAdded) {
+            if (inheritedOnly) {
+                if (isInheritedMethodAnnotated(annotationToBeAdded)) {
+                    if (! annotations.containsKey(annotationToBeAdded.annotationType())) {
+                        add(annotations, annotationToBeAdded);
+                    }
+                }
+            } else {
+                add(annotations, annotationToBeAdded);
+            }
+        }
+    }
+
+    private void add(Map<Class<? extends Annotation>,Annotation> annotations, Annotation annotationsToBeAdded) {
+        if (! annotations.containsKey(annotationsToBeAdded.annotationType())) {
+            annotations.put(annotationsToBeAdded.annotationType(), annotationsToBeAdded);
+        }
+    }
+
+    private boolean isInheritedMethodAnnotated(Annotation annotationToBeAdded) {
+        if (annotationToBeAdded.annotationType().getName().startsWith("java.lang")) {
+            return false;
+        }
+        if (annotationToBeAdded.annotationType().isAnnotationPresent(MethodInherited.class)) {
+            return true;
+        }
+        else  if (annotationToBeAdded.annotationType().getAnnotations().length ==0) {
+            return false;
+        }
+        else {
+            for (Annotation annotation : annotationToBeAdded.annotationType().getAnnotations()) {
+                if (isInheritedMethodAnnotated(annotation)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 }
