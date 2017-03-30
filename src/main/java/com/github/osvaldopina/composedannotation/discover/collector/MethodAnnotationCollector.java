@@ -10,7 +10,14 @@ import com.github.osvaldopina.composedannotation.annotation.MethodInherited;
 
 public class MethodAnnotationCollector implements AnnotationCollector {
 
+
+    public static final MethodAnnotationCollector INSTANCE = new MethodAnnotationCollector();
+
     private BridgedMethodFinder bridgedMethodFinder = BridgedMethodFinder.INSTANCE;
+
+    protected MethodAnnotationCollector() {
+
+    }
 
     @Override
     public Set<Annotation> collectAll(AnnotatedElement annotatedElement) {

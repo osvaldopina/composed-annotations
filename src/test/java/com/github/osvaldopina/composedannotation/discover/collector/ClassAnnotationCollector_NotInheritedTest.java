@@ -1,6 +1,7 @@
 package com.github.osvaldopina.composedannotation.discover.collector;
 
 
+import static com.github.osvaldopina.composedannotation.discover.collector.AnnotationTypeMatcher.annotation;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -8,12 +9,10 @@ import java.lang.annotation.*;
 import java.util.Set;
 
 import com.github.osvaldopina.composedannotation.configuration.spring.config.AopAdvice;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ClassAnnotationCollectorTest {
+public class ClassAnnotationCollector_NotInheritedTest {
 
 	private ClassAnnotationCollector classAnnotationCollector;
 
@@ -39,15 +38,9 @@ public class ClassAnnotationCollectorTest {
 
 		Set<Annotation> annotations = classAnnotationCollector.collectAll(clazz);
 
-		assertThat(annotations, hasSize(5));
+		assertThat(annotations, hasSize(1));
 
-		assertThat(annotations, containsInAnyOrder(
-				new AnnotationTypeMatcher(FirstAnnotation.class),
-				new AnnotationTypeMatcher(SecondAnnotation.class),
-				new AnnotationTypeMatcher(ThirdAnnotation.class),
-				new AnnotationTypeMatcher(ForthAnnotation.class),
-				new AnnotationTypeMatcher(FifthAnnotation.class)
-		));
+		assertThat(annotations, contains(annotation(ASubClassAnnotation.class)));
 	}
 
 	@Test
@@ -60,15 +53,8 @@ public class ClassAnnotationCollectorTest {
 
 		Set<Annotation> annotations = classAnnotationCollector.collectAll(clazz);
 
-		assertThat(annotations, hasSize(5));
+		assertThat(annotations, hasSize(0));
 
-		assertThat(annotations, containsInAnyOrder(
-				new AnnotationTypeMatcher(FirstAnnotation.class),
-				new AnnotationTypeMatcher(SecondAnnotation.class),
-				new AnnotationTypeMatcher(ThirdAnnotation.class),
-				new AnnotationTypeMatcher(ForthAnnotation.class),
-				new AnnotationTypeMatcher(FifthAnnotation.class)
-		));
 	}
 
 	@Test
@@ -81,114 +67,78 @@ public class ClassAnnotationCollectorTest {
 
 		Set<Annotation> annotations = classAnnotationCollector.collectAll(clazz);
 
-		assertThat(annotations, hasSize(4));
+		assertThat(annotations, hasSize(2));
 
 		assertThat(annotations, containsInAnyOrder(
-				new AnnotationTypeMatcher(FirstAnnotation.class),
-				new AnnotationTypeMatcher(SecondAnnotation.class),
-				new AnnotationTypeMatcher(ThirdAnnotation.class),
-				new AnnotationTypeMatcher(SixthAnnotation.class)
-		));
+				annotation(ASubSubInterfaceAnnotation.class),
+				annotation(OtherInterfaceAnnotation.class)));
 	}
 
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	public static @interface FirstAnnotation {
+	public static @interface AInterfaceAnnotation {
 
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	public static @interface SecondAnnotation {
+	public static @interface ASubInterfaceAnnotation {
 
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	public static @interface ThirdAnnotation {
+	public static @interface ASubSubInterfaceAnnotation {
 
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	public static @interface ForthAnnotation {
+	public static @interface AClassAnnotation {
 
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	public static @interface FifthAnnotation {
+	public static @interface ASubClassAnnotation {
 
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	public static @interface SixthAnnotation {
+	public static @interface OtherInterfaceAnnotation {
 
 	}
 
-	@FirstAnnotation
+	@AInterfaceAnnotation
 	public static interface AInterface {
 
 	}
 
-	@SecondAnnotation
+	@ASubInterfaceAnnotation
 	public static interface ASubInterface extends AInterface {
 
 	}
 
-	@ThirdAnnotation
+	@ASubSubInterfaceAnnotation
 	public static interface ASubSubInterface extends ASubInterface {
 
 	}
 
-	@SixthAnnotation
+	@OtherInterfaceAnnotation
 	public static interface OtherInterface {
 
 	}
 
-	@ForthAnnotation
+	@AClassAnnotation
 	public static class AClass implements ASubInterface {
 
 	}
 
-	@FifthAnnotation
+	@ASubClassAnnotation
 	public static class ASubClass extends AClass implements ASubSubInterface {
 
 	}
 
-	public static class AnnotationTypeMatcher extends BaseMatcher<Annotation> {
-
-		private Class<? extends Annotation> annotationType;
-		private Annotation annotation;
-		private boolean notAnAnnotation;
-
-		public AnnotationTypeMatcher(Class<? extends Annotation> annotationType) {
-			this.annotationType = annotationType;
-		}
-
-
-		@Override
-		public boolean matches(Object item) {
-
-			if (!(item instanceof Annotation)) {
-				notAnAnnotation = false;
-				return false;
-			} else {
-				notAnAnnotation = true;
-				annotation = (Annotation) item;
-				return annotation.annotationType().equals(annotationType);
-			}
-		}
-
-		@Override
-		public void describeTo(Description description) {
-			if (notAnAnnotation) {
-				description.appendText("is not an annotation");
-			} else {
-				description.appendText("expecting annotation type " + annotationType);
-			}
-		}
-	}
 }

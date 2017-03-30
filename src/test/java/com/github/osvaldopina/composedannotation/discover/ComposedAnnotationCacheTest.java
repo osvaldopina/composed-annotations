@@ -36,7 +36,6 @@ public class ComposedAnnotationCacheTest extends EasyMockSupport {
 	public ComposedAnnotationCacheTest() throws NoSuchMethodException {
 	}
 
-
 	@Before
 	public void setUp() {
 		composedAnnotationCache = new ComposedAnnotationCache(composedAnnotationDiscover);

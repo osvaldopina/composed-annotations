@@ -21,6 +21,9 @@ public class AnnotationTypeMatcher extends BaseMatcher<Annotation> {
 		return new AnnotationTypeMatcher(annotationType, value);
 	}
 
+	public static AnnotationTypeMatcher annotation(Class<? extends Annotation> annotationType) {
+		return new AnnotationTypeMatcher(annotationType, null);
+	}
 
 	public AnnotationTypeMatcher(Class<? extends Annotation> annotationType, String value) {
 		this.annotationType = annotationType;
@@ -40,7 +43,7 @@ public class AnnotationTypeMatcher extends BaseMatcher<Annotation> {
 			return false;
 		}
 		try {
-			if (! value.equals(annotation.annotationType().getMethod("value").invoke(annotation))) {
+			if (value != null && ! value.equals(annotation.annotationType().getMethod("value").invoke(annotation))) {
 				return false;
 			}
 		} catch (Exception e) {

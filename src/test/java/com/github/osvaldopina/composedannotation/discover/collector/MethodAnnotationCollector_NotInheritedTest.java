@@ -10,11 +10,8 @@ import java.lang.reflect.Method;
 import java.util.Set;
 
 import com.github.osvaldopina.composedannotation.configuration.spring.config.AopAdvice;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.core.annotation.AnnotationUtils;
 
 public class MethodAnnotationCollector_NotInheritedTest {
 
@@ -35,7 +32,7 @@ public class MethodAnnotationCollector_NotInheritedTest {
 
 		assertThat(annotations, hasSize(1));
 
-		assertThat(annotations, contains(annotation(FithAnnotation.class,"ASubClass")));
+		assertThat(annotations, contains(annotation(ASubClass_aClassMethod.class,"ASubClass")));
 
 	}
 
@@ -63,7 +60,7 @@ public class MethodAnnotationCollector_NotInheritedTest {
 
 		assertThat(annotations, hasSize(1));
 
-		assertThat(annotations, contains(annotation(ForthAnnotation.class,"ASubClass")));
+		assertThat(annotations, contains(annotation(ASubClass_aInterfaceMethod.class,"ASubClass")));
 
 	}
 
@@ -91,7 +88,7 @@ public class MethodAnnotationCollector_NotInheritedTest {
 
 		assertThat(annotations, hasSize(1));
 
-		assertThat(annotations, contains(annotation(ThirdAnnotation.class,"ASubClass")));
+		assertThat(annotations, contains(annotation(ASubClass_aSubClassMethod.class,"ASubClass")));
 	}
 
 	@Test
@@ -110,60 +107,60 @@ public class MethodAnnotationCollector_NotInheritedTest {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public static @interface FirstAnnotation {
+	public static @interface AInterface_aInterfaceMethod {
 		String value();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public static @interface SecondAnnotation {
+	public static @interface AClass_aClassMethod {
 		String value();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public static @interface ThirdAnnotation {
+	public static @interface ASubClass_aSubClassMethod {
 		String value();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public static @interface ForthAnnotation {
+	public static @interface ASubClass_aInterfaceMethod {
 		String value();
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.METHOD)
-	public static @interface FithAnnotation {
+	public static @interface ASubClass_aClassMethod {
 		String value();
 	}
 
 	public static interface AInterface {
 
-		@FirstAnnotation("AInterface")
+		@AInterface_aInterfaceMethod("AInterface")
 		void aInterfaceMethod();
 	}
 
 	public static class AClass {
 
-		@SecondAnnotation("AClass")
+		@AClass_aClassMethod("AClass")
 		public void aClassMethod() {
 		}
 	}
 
 	public static class ASubClass extends AClass implements AInterface {
 
-		@ThirdAnnotation("ASubClass")
+		@ASubClass_aSubClassMethod("ASubClass")
 		public void aSubClassMethod() {
 		}
 
 		@Override
-		@ForthAnnotation("ASubClass")
+		@ASubClass_aInterfaceMethod("ASubClass")
 		public void aInterfaceMethod() {
 		}
 
 		@Override
-		@FithAnnotation("ASubClass")
+		@ASubClass_aClassMethod("ASubClass")
 		public void aClassMethod() {
 		}
 

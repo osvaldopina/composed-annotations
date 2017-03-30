@@ -12,7 +12,6 @@ import java.util.Set;
 import com.github.osvaldopina.composedannotation.annotation.MethodInherited;
 import com.github.osvaldopina.composedannotation.configuration.spring.config.AopAdvice;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -49,7 +48,7 @@ public class MethodAnnotationCollector_MethodInheritedTest {
         assertThat(annotations, hasSize(1));
 
         assertThat(annotations, contains(
-                annotation(ASubClass_ASubClassMethodAnnotation.class, "ASubClass")));
+                annotation(ASubClass_aSubClassMethodAnnotation.class, "ASubClass")));
     }
 
     /**
@@ -72,7 +71,7 @@ public class MethodAnnotationCollector_MethodInheritedTest {
         assertThat(annotations, hasSize(1));
 
         assertThat(annotations, contains(
-                annotation(ASubClass_ASubClassMethodAnnotation.class, "ASubClass")));
+                annotation(ASubClass_aSubClassMethodAnnotation.class, "ASubClass")));
     }
 
     /**
@@ -93,8 +92,8 @@ public class MethodAnnotationCollector_MethodInheritedTest {
         assertThat(annotations, hasSize(2));
 
         assertThat(annotations, containsInAnyOrder(
-                annotation(ASubClass_AInterfaceMethodAnnotation.class, "ASubClass"),
-                annotation(AInterface_AInterfaceMethod.class, "AInterface")));
+                annotation(ASubClass_aInterfaceMethodAnnotation.class, "ASubClass"),
+                annotation(AInterface_aInterfaceMethod.class, "AInterface")));
     }
 
     /**
@@ -120,8 +119,8 @@ public class MethodAnnotationCollector_MethodInheritedTest {
         assertThat(annotations, hasSize(2));
 
         assertThat(annotations, containsInAnyOrder(
-                annotation(ASubClass_AInterfaceMethodAnnotation.class, "ASubClass"),
-                annotation(AInterface_AInterfaceMethod.class, "AInterface")));
+                annotation(ASubClass_aInterfaceMethodAnnotation.class, "ASubClass"),
+                annotation(AInterface_aInterfaceMethod.class, "AInterface")));
     }
 
     /**
@@ -142,8 +141,8 @@ public class MethodAnnotationCollector_MethodInheritedTest {
         assertThat(annotations, hasSize(2));
 
         assertThat(annotations, containsInAnyOrder(
-                annotation(AClass_AClassMethodAnnotation.class, "AClass"),
-                annotation(ASubClass_AClassMethodAnnotation.class, "ASubClass")));
+                annotation(AClass_aClassMethodAnnotation.class, "AClass"),
+                annotation(ASubClass_aClassMethodAnnotation.class, "ASubClass")));
     }
 
     /**
@@ -169,14 +168,14 @@ public class MethodAnnotationCollector_MethodInheritedTest {
         assertThat(annotations, hasSize(2));
 
         assertThat(annotations, containsInAnyOrder(
-                annotation(AClass_AClassMethodAnnotation.class, "AClass"),
-                annotation(ASubClass_AClassMethodAnnotation.class, "ASubClass")));
+                annotation(AClass_aClassMethodAnnotation.class, "AClass"),
+                annotation(ASubClass_aClassMethodAnnotation.class, "ASubClass")));
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @MethodInherited
-    public static @interface AInterface_AInterfaceMethod {
+    public static @interface AInterface_aInterfaceMethod {
 
         String value();
     }
@@ -184,7 +183,7 @@ public class MethodAnnotationCollector_MethodInheritedTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @MethodInherited
-    public static @interface AClass_AClassMethodAnnotation {
+    public static @interface AClass_aClassMethodAnnotation {
 
         String value();
     }
@@ -192,7 +191,7 @@ public class MethodAnnotationCollector_MethodInheritedTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @MethodInherited
-    public static @interface ASubClass_ASubClassMethodAnnotation {
+    public static @interface ASubClass_aSubClassMethodAnnotation {
 
         String value();
     }
@@ -200,7 +199,7 @@ public class MethodAnnotationCollector_MethodInheritedTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @MethodInherited
-    public static @interface ASubClass_AInterfaceMethodAnnotation {
+    public static @interface ASubClass_aInterfaceMethodAnnotation {
 
         String value();
     }
@@ -208,37 +207,37 @@ public class MethodAnnotationCollector_MethodInheritedTest {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     @MethodInherited
-    public static @interface ASubClass_AClassMethodAnnotation {
+    public static @interface ASubClass_aClassMethodAnnotation {
 
         String value();
     }
 
     public static interface AInterface {
 
-        @AInterface_AInterfaceMethod("AInterface")
+        @AInterface_aInterfaceMethod("AInterface")
         void aInterfaceMethod();
     }
 
     public static class AClass {
 
-        @AClass_AClassMethodAnnotation("AClass")
+        @AClass_aClassMethodAnnotation("AClass")
         public void aClassMethod() {
         }
     }
 
     public static class ASubClass extends AClass implements AInterface {
 
-        @ASubClass_ASubClassMethodAnnotation("ASubClass")
+        @ASubClass_aSubClassMethodAnnotation("ASubClass")
         public void aSubClassMethod() {
         }
 
         @Override
-        @ASubClass_AInterfaceMethodAnnotation("ASubClass")
+        @ASubClass_aInterfaceMethodAnnotation("ASubClass")
         public void aInterfaceMethod() {
         }
 
         @Override
-        @ASubClass_AClassMethodAnnotation("ASubClass")
+        @ASubClass_aClassMethodAnnotation("ASubClass")
         public void aClassMethod() {
         }
     }
